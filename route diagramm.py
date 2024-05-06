@@ -52,7 +52,7 @@ def plot_route_diagram(data):
     plt.xlim(times[0], times[-1])  # Setze die Grenzen der X-Achse
     plt.gca().xaxis.set_major_locator(plt.MaxNLocator(20))  # Ändere die Anzahl der X-Achsenticks
     plt.tight_layout()
-    plt.savefig('route_diagram.png', dpi=300)  # Speichere das Diagramm als PNG-Datei mit höherer Auflösung
+    plt.savefig('diagramme/route_diagram.png', dpi=300)  # Speichere das Diagramm als PNG-Datei mit höherer Auflösung
     plt.show()
 
 def plot_firstroute_diagram(data, filename):
@@ -77,11 +77,11 @@ def plot_firstroute_diagram(data, filename):
     plt.show()
 
 
-filename = "route-all.csv"
+filename = "tabellen/route-all.csv"
 data = load_data(filename)
 if data:
     plot_route_diagram(data)
     first_day_data = [entry for entry in data if entry[0].day == 28 and entry[0].month == 3]  # Filtere nach dem ersten Tag
-    plot_firstroute_diagram(first_day_data, 'first_day_diagram.png')  # Erstelle das Diagramm für den ersten Tag
+    plot_firstroute_diagram(first_day_data, 'diagramme/first_day_diagram.png')  # Erstelle das Diagramm für den ersten Tag
 else:
     print("Keine Daten zum Plotten gefunden.")

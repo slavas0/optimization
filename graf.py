@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 # Daten einlesen
-with open('graph.csv', 'r') as f:
+with open('tabellen/graph.csv', 'r') as f:
     data = f.readlines()
 
 # Punkte und Verbindungen extrahieren
@@ -37,7 +37,7 @@ plt.title('Graphische Darstellung von Verbindungen')
 plt.grid(True)
 
 # Diagramm speichern mit höherer Auflösung
-plt.savefig('graph.png', dpi=300)  # Höhere Auflösung (dots per inch)
+plt.savefig('diagramme/graph.png', dpi=300)  # Höhere Auflösung (dots per inch)
 
 # Plot anzeigen
 plt.show()

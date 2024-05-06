@@ -26,7 +26,7 @@ def write_sorted_rows(sorted_rows, output_filename):
             writer.writerow(row)
 
 # Beispielaufruf
-filename = 'route-all.csv'
+filename = 'tabellen/route-all.csv'
 output_filename = 'sorted_route.csv'
 
 # Anzahl der Zahlen in jeder Zeile zählen und sortieren
