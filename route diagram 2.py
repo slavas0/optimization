@@ -9,17 +9,32 @@ def addnum(speeds, routes):
     distance_tab = load_distance()
     for i in range(len(routes)-1):
         edge = findedge(routes[i], routes[i + 1])
+        index = findindex(edge)
+        #print(edge, index)
         if edge == 0:
             return 0
-        print(len(speeds))
+       # print(len(speeds))
         try:
-            edgeweight = finddist(distance_tab, edge) / speeds[edge]
-            print(f"erfolgreich für {edge}")
+            if speeds[index] == 0:
+                return 10
+            edgeweight = finddist(distance_tab, edge) / speeds[index]
+       #     print(f"erfolgreich für {edge}")
         except:
             print(f"Error calculating edge weight for edge {edge}")
             return None
         erg += edgeweight
     return erg
+def findindex(edge):
+    filename5 = "tabellen/data-all.csv"
+    with open(filename5, 'r') as file:
+        for line in file:
+            parts = line.strip().split(',')
+            parts = [part for part in parts if part]
+            for i in range(len(parts)):
+                if int(parts[i]) == edge:
+                    return i
+            break
+    return 0
 def findedge(a, b):
     filename4 = "tabellen/graph.csv"
     with open(filename4, 'r') as file:
@@ -43,6 +58,7 @@ def load_distance():
     with open(filename3, 'r') as file:
         for line in file:
             parts = line.strip().split(',')
+            parts = [part for part in parts if part]
             numbers = [int(parts[1]), float(parts[4]), float(parts[5]), float(parts[6]), float(parts[7])]  # edgename, coord a, coord b
             latitude_a_rad = np.radians(numbers[2])
             latitude_b_rad = np.radians(numbers[4])
@@ -59,7 +75,7 @@ def load_distance():
             erg = [numbers[0], dist]
             data3.append(erg)
     return data3
-def load_timeroute():
+def load_speedsroute():
     filename2 = "tabellen/data-all.csv"
     data2 = []
     with open(filename2, 'r') as file:
@@ -68,23 +84,29 @@ def load_timeroute():
             if start:
                 start = False
                 continue
+            #print(line)
             parts = line.strip().split(',')
-            numbers = [float(num) for num in parts[:-3]]  # Nur Zahlen, nicht Uhrzeit und Datum
+            parts = [part for part in parts if part]
+            #print(len(parts))
+            numbers = [float(num) for num in parts[:-3]]  #
             #time = parse_time(parts[-2], parts[-3], parts[-1])  # Monat, Tag und Uhrzeit
             data2.append(numbers)
+            #print(len(numbers))
     return data2
 def load_dataroute():
     filename1 = "tabellen/route-all.csv"
     data = []
-    speeds = load_timeroute()
+    speeds = load_speedsroute()
     with open(filename1, 'r') as file:
         for line in file:
             parts = line.strip().split(',')
+            parts = [part for part in parts if part]
             if len(parts) >= 4:  # Mindestens vier Teile müssen vorhanden sein
                 numbers = [int(num) for num in parts[:-3]]  # Nur Zahlen, nicht Uhrzeit und Datum
                 time = parse_time(parts[-2], parts[-3], parts[-1])  # Tag, Monat und Uhrzeit
                 lenroute = addnum(speeds[len(data)], numbers)
                 data.append((time, lenroute))
+                print(time)
     return data
 
 def parse_time(month_str, day_str, time_str):
@@ -122,7 +144,7 @@ def plot_route_diagram(data):
         plt.fill_between(x, y, color=color, alpha=0.5, linewidth=0)
     plt.plot(times, values, color='green')
     plt.xlabel('Datum')
-    plt.ylabel('Anzahl der Knoten')
+    plt.ylabel('Zeit von 94 nach 162')
     plt.title('Route Diagramm')
     plt.xticks(rotation=45)
     plt.xlim(times[0], times[-1])  # Setze die Grenzen der X-Achse
@@ -142,7 +164,7 @@ def plot_firstroute_diagram(data, filename):
         plt.fill_between(x, y, color=color, alpha=0.5, linewidth=0)
     plt.plot(times, values, color='green')
     plt.xlabel('Uhrzeit')  # Ändere die Beschriftung der X-Achse
-    plt.ylabel('Anzahl der Knoten')
+    plt.ylabel('Zeit von 94 nach 162')
     plt.title('Erster Tag Diagramm2 (28. März)')
     plt.xticks(rotation=45)
     plt.xlim(times[0], times[-1])  # Setze die Grenzen der X-Achse
