@@ -1,12 +1,64 @@
+#route diagram 2 erzeugt die selbe grafik wie route diagram (1) nur die amplitude gibt die tatsächliche zeit an, nicht nur knotenzahl (route von 94 nach 162)
 import matplotlib.pyplot as plt
 from datetime import datetime
 import matplotlib.dates as mdates
+import numpy as np
 
-def addnum(d, n):
+def addnum(speeds, routes):
     erg = 0
-    for i in n:
-        erg += d[i]
+    distance_tab = load_distance()
+    for i in range(len(routes)-1):
+        edge = findedge(routes[i], routes[i + 1])
+        if edge == 0:
+            return 0
+        print(len(speeds))
+        try:
+            edgeweight = finddist(distance_tab, edge) / speeds[edge]
+            print(f"erfolgreich für {edge}")
+        except:
+            print(f"Error calculating edge weight for edge {edge}")
+            return None
+        erg += edgeweight
     return erg
+def findedge(a, b):
+    filename4 = "tabellen/graph.csv"
+    with open(filename4, 'r') as file:
+        for line in file:
+            parts = line.strip().split(',')
+            numbers = [int(num) for num in parts[:4]]  # Nur Zahlen, nicht Uhrzeit und Datum
+            if numbers[2] == a and numbers[3] == b:
+                return numbers[1]
+    print("Keine edge gefunden")
+    return 0
+def finddist(arr, edge):
+    for comb in arr:
+        if comb[0] == edge:
+            return comb[1]
+    print("Keine dist gefunden")
+    return 0
+def load_distance():
+    filename3 = "tabellen/graph.csv"
+    data3 = []
+    earth_radius_km = 6371.01
+    with open(filename3, 'r') as file:
+        for line in file:
+            parts = line.strip().split(',')
+            numbers = [int(parts[1]), float(parts[4]), float(parts[5]), float(parts[6]), float(parts[7])]  # edgename, coord a, coord b
+            latitude_a_rad = np.radians(numbers[2])
+            latitude_b_rad = np.radians(numbers[4])
+            longitude_a_rad = np.radians(numbers[1])
+            longitude_b_rad = np.radians(numbers[3])
+            delta_lat = latitude_b_rad - latitude_a_rad
+            delta_lon = longitude_b_rad - longitude_a_rad
+            a = np.sin(delta_lat / 2) * np.sin(delta_lat / 2) + \
+                np.cos(latitude_a_rad) * np.cos(latitude_b_rad) * \
+                np.sin(delta_lon / 2) * np.sin(delta_lon / 2)
+            c = 2 * np.arcsin(np.sqrt(a))
+            distance_km = earth_radius_km * c  # Distance in kilometers
+            dist = distance_km * 0.621371  # Conversion factor to miles
+            erg = [numbers[0], dist]
+            data3.append(erg)
+    return data3
 def load_timeroute():
     filename2 = "tabellen/data-all.csv"
     data2 = []
@@ -18,20 +70,20 @@ def load_timeroute():
                 continue
             parts = line.strip().split(',')
             numbers = [float(num) for num in parts[:-3]]  # Nur Zahlen, nicht Uhrzeit und Datum
-            time = parse_time(parts[-2], parts[-3], parts[-1])  # Monat, Tag und Uhrzeit
+            #time = parse_time(parts[-2], parts[-3], parts[-1])  # Monat, Tag und Uhrzeit
             data2.append(numbers)
     return data2
 def load_dataroute():
     filename1 = "tabellen/route-all.csv"
     data = []
-    times = load_timeroute()
+    speeds = load_timeroute()
     with open(filename1, 'r') as file:
         for line in file:
             parts = line.strip().split(',')
             if len(parts) >= 4:  # Mindestens vier Teile müssen vorhanden sein
                 numbers = [int(num) for num in parts[:-3]]  # Nur Zahlen, nicht Uhrzeit und Datum
                 time = parse_time(parts[-2], parts[-3], parts[-1])  # Tag, Monat und Uhrzeit
-                lenroute = addnum(times[len(data)], numbers)
+                lenroute = addnum(speeds[len(data)], numbers)
                 data.append((time, lenroute))
     return data
 
