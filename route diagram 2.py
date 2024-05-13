@@ -2,22 +2,44 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import matplotlib.dates as mdates
 
-def load_data(filename):
+def addnum(d, n):
+    erg = 0
+    for i in n:
+        erg += d[i]
+    return erg
+def load_timeroute():
+    filename2 = "tabellen/data-all.csv"
+    data2 = []
+    with open(filename2, 'r') as file:
+        start = True
+        for line in file:
+            if start:
+                start = False
+                continue
+            parts = line.strip().split(',')
+            numbers = [float(num) for num in parts[:-3]]  # Nur Zahlen, nicht Uhrzeit und Datum
+            time = parse_time(parts[-2], parts[-3], parts[-1])  # Monat, Tag und Uhrzeit
+            data2.append(numbers)
+    return data2
+def load_dataroute():
+    filename1 = "tabellen/route-all.csv"
     data = []
-    with open(filename, 'r') as file:
+    times = load_timeroute()
+    with open(filename1, 'r') as file:
         for line in file:
             parts = line.strip().split(',')
             if len(parts) >= 4:  # Mindestens vier Teile müssen vorhanden sein
                 numbers = [int(num) for num in parts[:-3]]  # Nur Zahlen, nicht Uhrzeit und Datum
-                time = parse_time(parts[-2], parts[-3], parts[-1])  # Monat, Tag und Uhrzeit
-                data.append((time, len(numbers)))
+                time = parse_time(parts[-2], parts[-3], parts[-1])  # Tag, Monat und Uhrzeit
+                lenroute = addnum(times[len(data)], numbers)
+                data.append((time, lenroute))
     return data
 
 def parse_time(month_str, day_str, time_str):
     month = convert_month(month_str)  # Konvertiere Monat in Zahl
     day = int(day_str.strip())  # Tag als Zahl
     hour, minute, second = map(int, time_str.split('_'))  # Uhrzeit extrahieren
-    return datetime(2024, month, day, hour, minute, second)
+    return datetime(2018, month, day, hour, minute, second)
 
 def convert_month(month_str):
     month_str = month_str.strip().lower()  # Entferne Leerzeichen und mache klein
@@ -25,6 +47,8 @@ def convert_month(month_str):
         return 3
     elif month_str == 'apr':
         return 4
+    elif month_str == 'mai':
+        return 5
     else:
         raise ValueError(f"Ungültiger Monat: {month_str}")
 
@@ -77,8 +101,7 @@ def plot_firstroute_diagram(data, filename):
     plt.show()
 
 
-filename = "tabellen/route-all.csv"
-data = load_data(filename)
+data = load_dataroute()
 
 if data:
     plot_route_diagram(data)
